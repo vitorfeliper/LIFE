@@ -41,6 +41,9 @@ public class TerrainGenerator : MonoBehaviour
     [SerializeField] private Sprite log;
     [SerializeField] private Sprite leaf;
 
+    [Header("Generation Settings")]
+    [SerializeField] private int chunckSize = 16;
+
     [Header("Set World Configurations")]
     [SerializeField, Range(8, 10048)] private int worldSize = 100;
     [SerializeField] private float caveFreq = 0.05f; // The higher the frequency, the greater the amount of caves
@@ -59,13 +62,22 @@ public class TerrainGenerator : MonoBehaviour
     [SerializeField] private bool generateCaves = true;
 
 
-    private void Start() // This function go make a dynamic update seed and Terrain Generation without void Update(){...} and without press
-                             // Play - Stop
+    private void Start()
     {
         seed = Random.Range(-10000, 10000); // Seed random generation
         //seed = -1816;
         GenerateNoiseTexture();
-        GenerateTerrain();
+        CreateChuncks();
+        //GenerateTerrain();
+    }
+
+    private void CreateChuncks()
+    {
+        int numChunks = worldSize / chunckSize;
+        for (int i = 0; i < numChunks; i++)
+        {
+            GameObject newChunk = new GameObject(name = i.ToString());
+        }
     }
 
     private void GenerateTerrain()
