@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -14,12 +15,33 @@ using UnityEngine;
 /// 
 /// LIFE terrain generator v0.07 rev 0.06
 /// {Created the terrain generator}
+/// LIFE terrain generator v0.2 rev 0.1
+/// {   
+///     Added texture in terrain,
+///     Added optin to create or not create caves,
+///     Added function to optimized the time,
+///     Added trees
+///     
+/// }
 /// </summary>
 
 public class TerrainGenerator : MonoBehaviour
 {
+    [Header("Terrain Texture Configurations")]
+    [SerializeField, Range(1, 15)] private int dirtLayerHeight = 5;
+    [Header("Global Atlas")]
+    [SerializeField] private Sprite grass;
+    [SerializeField] private Sprite dirt;
+    [SerializeField] private Sprite stone;
+
+    [Header("Trees")]
+    [SerializeField] private int treeChance = 10;
+    [SerializeField] private int minTreeHeight = 4;
+    [SerializeField] private int maxTreeHeight = 6;
+    [SerializeField] private Sprite log;
+    [SerializeField] private Sprite leaf;
+
     [Header("Set World Configurations")]
-    [SerializeField] private Sprite tile;
     [SerializeField, Range(8, 10048)] private int worldSize = 100;
     [SerializeField] private float caveFreq = 0.05f; // The higher the frequency, the greater the amount of caves
     [SerializeField] private float seed;
@@ -31,13 +53,17 @@ public class TerrainGenerator : MonoBehaviour
     [SerializeField, Range(1, 100)] private int heightAddition = 25;
     [SerializeField, Range(0.01f, 1)] private float terrainFreq = 0.05f;
     [SerializeField, Range(0.1f, 1)] private float caveSurfaceValue = 0.25f;
+    [SerializeField] private List<Vector2> worldTiles = new List<Vector2> ();
+
+    [Header("Boolean Variables to Configurate Caves and others")]
+    [SerializeField] private bool generateCaves = true;
 
 
     private void Start() // This function go make a dynamic update seed and Terrain Generation without void Update(){...} and without press
                              // Play - Stop
     {
         seed = Random.Range(-10000, 10000); // Seed random generation
-        //seed = -1035;
+        //seed = -1816;
         GenerateNoiseTexture();
         GenerateTerrain();
     }
@@ -51,13 +77,45 @@ public class TerrainGenerator : MonoBehaviour
             //This setup allows me to set a flat world on the Y axis which is what we need initially
             for (int y = 0; y < height; y++)
             {
-                if (noiseTexture.GetPixel(x, y).r > caveSurfaceValue) // If pixels x or y > 0.2f then create game objects with perlim noise 2D
+                Sprite tileSprite;
+
+                if(y < height - dirtLayerHeight)
                 {
-                    GameObject newTile = new GameObject(name = "tile"); // Tile as a new Object
-                    newTile.transform.parent = this.transform; // All objects'll be  sons of Main object
-                    newTile.AddComponent<SpriteRenderer>(); // Add a SpriteRenderer component in GameObject Tile
-                    newTile.GetComponent<SpriteRenderer>().sprite = tile; // The tile var = SpriteRenderer component
-                    newTile.transform.position = new Vector2(x + 0.5f, y + 0.5f); // Updated tile position in centered
+                    tileSprite = stone;
+                }
+                else if(y < height - 1)
+                {
+                    tileSprite = dirt;
+                }
+                else
+                {
+                    //top layer of the terrain//
+                    tileSprite = grass;
+                }
+
+                if (generateCaves)
+                {
+                    if (noiseTexture.GetPixel(x, y).r > caveSurfaceValue) // If pixels x or y > 0.2f then create game objects with perlim noise 2D
+                    {
+                        PlaceTile(tileSprite, x, y);
+                    }
+                }
+                else
+                {
+                    PlaceTile(tileSprite, x, y);
+                }
+
+                if(y >= height - 1)
+                {
+                    int t = Random.Range(0, treeChance);
+                    if (t == 1)
+                    {
+                        //Generate tree
+                        if (worldTiles.Contains(new Vector2(x, y)))
+                        {
+                            GenerateTree(x, y + 1);
+                        }
+                    }
                 }
             }
         }
@@ -84,5 +142,47 @@ public class TerrainGenerator : MonoBehaviour
         }
 
         noiseTexture.Apply(); // Apply modifications
+    }
+
+    private void GenerateTree(float x, float y)
+    {   
+        // Define our tree
+
+        //Generate Log
+        int treeHeight = Random.Range(minTreeHeight, maxTreeHeight);
+        for (int i = 0; i < treeHeight; i++)
+        {
+            PlaceTile(log, x, y + i);
+        }
+
+        //Generate Leaves
+
+        #region Y Leaves
+        PlaceTile(leaf, x, y + treeHeight);
+        PlaceTile(leaf, x, y + treeHeight + 1);
+        PlaceTile(leaf, x, y + treeHeight + 2);
+        #endregion
+
+        #region X left Leaves
+        PlaceTile(leaf, x - 1, y + treeHeight);
+        PlaceTile(leaf, x - 1, y + treeHeight + 1);
+        #endregion
+
+        #region X right Leaves
+        PlaceTile(leaf, x + 1, y + treeHeight);
+        PlaceTile(leaf, x + 1, y + treeHeight + 1);
+        #endregion
+    }
+
+    private void PlaceTile(Sprite tileSprite, float x, float y)
+    {
+        GameObject newTile = new GameObject(); // Tile as a new Object
+        newTile.transform.parent = this.transform; // All objects'll be  sons of Main object
+        newTile.AddComponent<SpriteRenderer>(); // Add a SpriteRenderer component in GameObject Tile
+        newTile.GetComponent<SpriteRenderer>().sprite = tileSprite; // The tile var = SpriteRenderer component
+        newTile.name = tileSprite.name;
+        newTile.transform.position = new Vector2(x + 0.5f, y + 0.5f); // Updated tile position in centered
+
+        worldTiles.Add(newTile.transform.position - (Vector3.one * 0.5f));
     }
 }
