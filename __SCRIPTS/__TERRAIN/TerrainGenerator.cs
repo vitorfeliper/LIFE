@@ -23,6 +23,12 @@ using UnityEngine;
 ///     Added trees
 ///     
 /// }
+/// 
+/// /// LIFE terrain generator v0.3 rev 0.2
+/// {   
+///     Chuncks added
+///     Bugs in casting float to int fixs
+/// }
 /// </summary>
 
 public class TerrainGenerator : MonoBehaviour
@@ -61,6 +67,10 @@ public class TerrainGenerator : MonoBehaviour
     [Header("Boolean Variables to Configurate Caves and others")]
     [SerializeField] private bool generateCaves = true;
 
+    //Private variables dont need the inspector
+
+    private GameObject[] worldChuncks;
+
 
     private void Start()
     {
@@ -68,15 +78,21 @@ public class TerrainGenerator : MonoBehaviour
         //seed = -1816;
         GenerateNoiseTexture();
         CreateChuncks();
-        //GenerateTerrain();
+        GenerateTerrain();
     }
 
     private void CreateChuncks()
     {
         int numChunks = worldSize / chunckSize;
+
+        worldChuncks = new GameObject[numChunks];
+
         for (int i = 0; i < numChunks; i++)
         {
-            GameObject newChunk = new GameObject(name = i.ToString());
+            GameObject newChunk = new GameObject();
+            newChunk.name = "Chunk[ " + i.ToString() + " ]";
+            newChunk.transform.parent = this.transform; // The objects = Sons objects
+            worldChuncks[i] = newChunk;
         }
     }
 
@@ -156,7 +172,7 @@ public class TerrainGenerator : MonoBehaviour
         noiseTexture.Apply(); // Apply modifications
     }
 
-    private void GenerateTree(float x, float y)
+    private void GenerateTree(int x, int y)
     {   
         // Define our tree
 
@@ -186,10 +202,15 @@ public class TerrainGenerator : MonoBehaviour
         #endregion
     }
 
-    private void PlaceTile(Sprite tileSprite, float x, float y)
+    private void PlaceTile(Sprite tileSprite, int x, int y)
     {
         GameObject newTile = new GameObject(); // Tile as a new Object
-        newTile.transform.parent = this.transform; // All objects'll be  sons of Main object
+
+        float chuckCoord = (Mathf.Round(x / chunckSize) * chunckSize);
+        chuckCoord /= chunckSize;
+        newTile.transform.parent = worldChuncks[(int)chuckCoord].transform; // All objects'll be  sons of Main object
+
+
         newTile.AddComponent<SpriteRenderer>(); // Add a SpriteRenderer component in GameObject Tile
         newTile.GetComponent<SpriteRenderer>().sprite = tileSprite; // The tile var = SpriteRenderer component
         newTile.name = tileSprite.name;

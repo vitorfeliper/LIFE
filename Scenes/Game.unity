@@ -291,7 +291,8 @@ MonoBehaviour:
   maxTreeHeight: 6
   log: {fileID: 21300000, guid: 8d3636fa062a69e4e963683238245fba, type: 3}
   leaf: {fileID: 21300000, guid: 7813aa0e73d619440bdbfbbaa0a758a4, type: 3}
-  worldSize: 100
+  chunckSize: 20
+  worldSize: 400
   caveFreq: 0.08
   seed: 2394
   noiseTexture: {fileID: 848496936}
