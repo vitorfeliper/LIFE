@@ -36,6 +36,10 @@ using UnityEngine;
 ///     Bugs fixs
 ///     Scripts reorder
 /// }
+/// /// /// /// LIFE terrain generator v0.5 rev 0.4
+/// {   
+///     Logic optimized
+/// }
 /// </summary>
 
 public class TerrainGenerator : MonoBehaviour
@@ -61,8 +65,9 @@ public class TerrainGenerator : MonoBehaviour
     [SerializeField] private Texture2D caveNoiseTexture;
 
     [Header("Ore Settings")]
-    [SerializeField] private float coalRarity;
-    [SerializeField]private float coalSize;
+    [SerializeField] private OreClass[] ores;
+/*    [SerializeField] private float coalRarity;
+    [SerializeField] private float coalSize;
     [SerializeField] private float ironRarity;
     [SerializeField] private float ironSize;
     [SerializeField] private float goldRarity;
@@ -73,7 +78,7 @@ public class TerrainGenerator : MonoBehaviour
     [SerializeField] private Texture2D ironSpread;
     [SerializeField] private Texture2D goldSpread;
     [SerializeField] private Texture2D diamondSpread;
-
+*/
 
     [Header("Advanced Configurations of World")]
     [SerializeField, Range(1, 100)] private float heightMultiplier = 4f;
@@ -91,22 +96,19 @@ public class TerrainGenerator : MonoBehaviour
 
     private void OnValidate()
     {
-        if (caveNoiseTexture == null)
-        {
-            caveNoiseTexture = new Texture2D(worldSize, worldSize);
-            coalSpread = new Texture2D(worldSize, worldSize);
-            ironSpread = new Texture2D(worldSize, worldSize);
-            goldSpread = new Texture2D(worldSize, worldSize);
-            diamondSpread = new Texture2D(worldSize, worldSize);
-        }
+        caveNoiseTexture = new Texture2D(worldSize, worldSize);
+        ores[0].spreadTexture = new Texture2D(worldSize, worldSize);
+        ores[1].spreadTexture = new Texture2D(worldSize, worldSize);
+        ores[2].spreadTexture = new Texture2D(worldSize, worldSize);
+        ores[3].spreadTexture = new Texture2D(worldSize, worldSize);
 
         GenerateNoiseTexture(caveFreq, caveSurfaceValue, caveNoiseTexture);
 
         //Ores
-        GenerateNoiseTexture(coalRarity, coalSize, coalSpread);
-        GenerateNoiseTexture(ironRarity, ironSize, ironSpread);
-        GenerateNoiseTexture(goldRarity, goldSize, goldSpread);
-        GenerateNoiseTexture(diamondRarity, diamondSize, diamondSpread);
+        GenerateNoiseTexture(ores[0].rarity, ores[0].size, ores[0].spreadTexture);
+        GenerateNoiseTexture(ores[1].rarity, ores[1].size, ores[1].spreadTexture);
+        GenerateNoiseTexture(ores[2].rarity, ores[2].size, ores[2].spreadTexture);
+        GenerateNoiseTexture(ores[3].rarity, ores[3].size, ores[3].spreadTexture);
 
     }
 
@@ -114,23 +116,20 @@ public class TerrainGenerator : MonoBehaviour
     {
         seed = Random.Range(-10000, 10000); // Seed random generation
 
-        if(caveNoiseTexture == null)
-        {
-            caveNoiseTexture = new Texture2D(worldSize, worldSize);
-            coalSpread = new Texture2D(worldSize, worldSize);
-            ironSpread = new Texture2D(worldSize, worldSize);
-            goldSpread = new Texture2D(worldSize, worldSize);
-            diamondSpread = new Texture2D(worldSize, worldSize);
-        }
+        caveNoiseTexture = new Texture2D(worldSize, worldSize);
+        ores[0].spreadTexture = new Texture2D(worldSize, worldSize);
+        ores[1].spreadTexture = new Texture2D(worldSize, worldSize);
+        ores[2].spreadTexture = new Texture2D(worldSize, worldSize);
+        ores[3].spreadTexture = new Texture2D(worldSize, worldSize);
 
-        //seed = -1816;
+        //seed = 5053;
         GenerateNoiseTexture(caveFreq, caveSurfaceValue,caveNoiseTexture);
 
         //Ores
-        GenerateNoiseTexture(coalRarity, coalSize, coalSpread);
-        GenerateNoiseTexture(ironRarity, ironSize ,ironSpread);
-        GenerateNoiseTexture(goldRarity, goldSize ,goldSpread);
-        GenerateNoiseTexture(diamondRarity, diamondSize ,diamondSpread);
+        GenerateNoiseTexture(ores[0].rarity, ores[0].size, ores[0].spreadTexture);
+        GenerateNoiseTexture(ores[1].rarity, ores[1].size, ores[1].spreadTexture);
+        GenerateNoiseTexture(ores[2].rarity, ores[2].size, ores[2].spreadTexture);
+        GenerateNoiseTexture(ores[3].rarity, ores[3].size, ores[3].spreadTexture);
 
         CreateChuncks();
         GenerateTerrain();
@@ -164,25 +163,22 @@ public class TerrainGenerator : MonoBehaviour
 
                 if(y < height - dirtLayerHeight)
                 {
-                    //Coal
-                    if (coalSpread.GetPixel(x, y).r > 0.5f)
-                        tileSprite = tileAtlas.coal.tileSprite;
-
-                    //Iron
-                    else if (ironSpread.GetPixel(x, y).r > 0.5f)
-                        tileSprite = tileAtlas.iron.tileSprite;
-
-                    //Gold
-                    else if (goldSpread.GetPixel(x, y).r > 0.5f)
-                        tileSprite = tileAtlas.gold.tileSprite;
-
-                    //Diamond
-                    else if (diamondSpread.GetPixel(x, y).r > 0.5f)
-                        tileSprite = tileAtlas.diamond.tileSprite;
-
-                    else
-                    //Stone
                     tileSprite = tileAtlas.stone.tileSprite;
+                    //Coal
+                    if (ores[0].spreadTexture.GetPixel(x, y).r > 0.5f && height - y > ores[0].maxSpwnHeight)
+                        tileSprite = tileAtlas.coal.tileSprite;                     
+                                                                                    
+                    //Iron                                                          
+                    if (ores[1].spreadTexture.GetPixel(x, y).r > 0.5f && height - y > ores[1].maxSpwnHeight)
+                        tileSprite = tileAtlas.iron.tileSprite;                     
+                                                                                    
+                    //Gold                                                          
+                    if (ores[2].spreadTexture.GetPixel(x, y).r > 0.5f && height - y > ores[2].maxSpwnHeight)
+                        tileSprite = tileAtlas.gold.tileSprite;                     
+                                                                                    
+                    //Diamond                                                       
+                    if (ores[3].spreadTexture.GetPixel(x, y).r > 0.5f && height - y > ores[3].maxSpwnHeight)
+                        tileSprite = tileAtlas.diamond.tileSprite;
                 }
                 else if(y < height - 1)
                 {
