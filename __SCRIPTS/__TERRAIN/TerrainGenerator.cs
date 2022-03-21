@@ -55,6 +55,10 @@ public class TerrainGenerator : MonoBehaviour
     [SerializeField] private int minTreeHeight = 4;
     [SerializeField] private int maxTreeHeight = 6;
 
+    [Header("Addons")]
+    [SerializeField] private int tallGrassChance = 10;
+
+
     [Header("Generation Settings")]
     [SerializeField] private int chunckSize = 16;
 
@@ -159,47 +163,47 @@ public class TerrainGenerator : MonoBehaviour
             //This setup allows me to set a flat world on the Y axis which is what we need initially
             for (int y = 0; y < height; y++)
             {
-                Sprite tileSprite;
+                Sprite[] tileSprites;
 
                 if(y < height - dirtLayerHeight)
                 {
-                    tileSprite = tileAtlas.stone.tileSprite;
+                    tileSprites = tileAtlas.stone.tileSprites;
                     //Coal
                     if (ores[0].spreadTexture.GetPixel(x, y).r > 0.5f && height - y > ores[0].maxSpwnHeight)
-                        tileSprite = tileAtlas.coal.tileSprite;                     
+                        tileSprites = tileAtlas.coal.tileSprites;                     
                                                                                     
                     //Iron                                                          
                     if (ores[1].spreadTexture.GetPixel(x, y).r > 0.5f && height - y > ores[1].maxSpwnHeight)
-                        tileSprite = tileAtlas.iron.tileSprite;                     
+                        tileSprites = tileAtlas.iron.tileSprites;                     
                                                                                     
                     //Gold                                                          
                     if (ores[2].spreadTexture.GetPixel(x, y).r > 0.5f && height - y > ores[2].maxSpwnHeight)
-                        tileSprite = tileAtlas.gold.tileSprite;                     
+                        tileSprites = tileAtlas.gold.tileSprites;                     
                                                                                     
                     //Diamond                                                       
                     if (ores[3].spreadTexture.GetPixel(x, y).r > 0.5f && height - y > ores[3].maxSpwnHeight)
-                        tileSprite = tileAtlas.diamond.tileSprite;
+                        tileSprites = tileAtlas.diamond.tileSprites;
                 }
                 else if(y < height - 1)
                 {
-                    tileSprite = tileAtlas.dirt.tileSprite;
+                    tileSprites = tileAtlas.dirt.tileSprites;
                 }
                 else
                 {
                     //top layer of the terrain//
-                    tileSprite = tileAtlas.grass.tileSprite;
+                    tileSprites = tileAtlas.grass.tileSprites;
                 }
 
                 if (generateCaves)
                 {
                     if (caveNoiseTexture.GetPixel(x, y).r > 0.5f) // If pixels x or y > 0.2f then create game objects with perlim noise 2D
                     {
-                        PlaceTile(tileSprite, x, y);
+                        PlaceTile(tileSprites, x, y);
                     }
                 }
                 else
                 {
-                    PlaceTile(tileSprite, x, y);
+                    PlaceTile(tileSprites, x, y);
                 }
 
                 if(y >= height - 1)
@@ -211,6 +215,25 @@ public class TerrainGenerator : MonoBehaviour
                         if (worldTiles.Contains(new Vector2(x, y)))
                         {
                             GenerateTree(x, y + 1);
+                        }
+                    }
+                    else
+                    {
+                        int i = Random.Range(0, tallGrassChance);
+
+                        //Generate tree
+                        if (worldTiles.Contains(new Vector2(x, y)))
+                        {
+                            PlaceTile(tileAtlas.tallGrass.tileSprites, x, y + 1);
+                        }
+                    }
+
+                    if(t == 2)
+                    {
+                        //Generate tree
+                        if (worldTiles.Contains(new Vector2(x, y)))
+                        {
+                            GenerateTreeOrange(x, y + 1);
                         }
                     }
                 }
@@ -245,6 +268,42 @@ public class TerrainGenerator : MonoBehaviour
         //noiseTexture = noise;
     }
 
+    private void GenerateTreeOrange(int x, int y)
+    {
+        // Define our tree
+
+        //Generate Log
+        int treeHeight = Random.Range(minTreeHeight, maxTreeHeight);
+        for (int i = 0; i < treeHeight; i++)
+        {
+            PlaceTile(tileAtlas.log.tileSprites, x, y + i);
+        }
+
+        //Generate Leaves
+
+        #region Y Leaves
+
+        PlaceTile(tileAtlas.leafOrange.tileSprites, x, y + treeHeight);
+        PlaceTile(tileAtlas.leafOrange.tileSprites, x, y + treeHeight + 1);
+        PlaceTile(tileAtlas.leafOrange.tileSprites, x, y + treeHeight + 2);
+
+        #endregion
+
+        #region X left Leaves
+
+        PlaceTile(tileAtlas.leafOrange.tileSprites, x - 1, y + treeHeight);
+        PlaceTile(tileAtlas.leafOrange.tileSprites, x - 1, y + treeHeight + 1);
+
+        #endregion
+
+        #region X right Leaves
+
+        PlaceTile(tileAtlas.leafOrange.tileSprites, x + 1, y + treeHeight);
+        PlaceTile(tileAtlas.leafOrange.tileSprites, x + 1, y + treeHeight + 1);
+
+        #endregion
+    }
+
     private void GenerateTree(int x, int y)
     {   
         // Define our tree
@@ -253,35 +312,35 @@ public class TerrainGenerator : MonoBehaviour
         int treeHeight = Random.Range(minTreeHeight, maxTreeHeight);
         for (int i = 0; i < treeHeight; i++)
         {
-            PlaceTile(tileAtlas.log.tileSprite, x, y + i);
+            PlaceTile(tileAtlas.log.tileSprites, x, y + i);
         }
 
         //Generate Leaves
 
         #region Y Leaves
 
-        PlaceTile(tileAtlas.leaf.tileSprite, x, y + treeHeight);
-        PlaceTile(tileAtlas.leaf.tileSprite, x, y + treeHeight + 1);
-        PlaceTile(tileAtlas.leaf.tileSprite, x, y + treeHeight + 2);
+        PlaceTile(tileAtlas.leaf.tileSprites, x, y + treeHeight);
+        PlaceTile(tileAtlas.leaf.tileSprites, x, y + treeHeight + 1);
+        PlaceTile(tileAtlas.leaf.tileSprites, x, y + treeHeight + 2);
 
         #endregion
 
         #region X left Leaves
 
-        PlaceTile(tileAtlas.leaf.tileSprite, x - 1, y + treeHeight);
-        PlaceTile(tileAtlas.leaf.tileSprite, x - 1, y + treeHeight + 1);
+        PlaceTile(tileAtlas.leaf.tileSprites, x - 1, y + treeHeight);
+        PlaceTile(tileAtlas.leaf.tileSprites, x - 1, y + treeHeight + 1);
 
         #endregion
 
         #region X right Leaves
 
-        PlaceTile(tileAtlas.leaf.tileSprite, x + 1, y + treeHeight);
-        PlaceTile(tileAtlas.leaf.tileSprite, x + 1, y + treeHeight + 1);
+        PlaceTile(tileAtlas.leaf.tileSprites, x + 1, y + treeHeight);
+        PlaceTile(tileAtlas.leaf.tileSprites, x + 1, y + treeHeight + 1);
 
         #endregion
     }
 
-    private void PlaceTile(Sprite tileSprite, int x, int y)
+    private void PlaceTile(Sprite[] tileSprites, int x, int y)
     {
         GameObject newTile = new GameObject(); // Tile as a new Object
 
@@ -291,8 +350,11 @@ public class TerrainGenerator : MonoBehaviour
 
 
         newTile.AddComponent<SpriteRenderer>(); // Add a SpriteRenderer component in GameObject Tile
-        newTile.GetComponent<SpriteRenderer>().sprite = tileSprite; // The tile var = SpriteRenderer component
-        newTile.name = tileSprite.name;
+
+        int spriteIndex = Random.Range(0, tileSprites.Length);
+
+        newTile.GetComponent<SpriteRenderer>().sprite = tileSprites[spriteIndex]; // The tile var = SpriteRenderer component
+        newTile.name = tileSprites[0].name;
         newTile.transform.position = new Vector2(x + 0.5f, y + 0.5f); // Updated tile position in centered
 
         worldTiles.Add(newTile.transform.position - (Vector3.one * 0.5f));

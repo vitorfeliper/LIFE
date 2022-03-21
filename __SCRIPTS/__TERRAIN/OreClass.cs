@@ -20,8 +20,8 @@ using UnityEngine;
 public class OreClass
 {
     public string name;
-    public float rarity;
-    public float size;
+    [Range(0, 1)] public float rarity;
+    [Range(0, 1)] public float size;
     public int maxSpwnHeight;
     public Texture2D spreadTexture;
 }
