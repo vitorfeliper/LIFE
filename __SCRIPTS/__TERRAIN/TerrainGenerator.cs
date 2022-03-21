@@ -40,6 +40,13 @@ using UnityEngine;
 /// {   
 ///     Logic optimized
 /// }
+/// /// /// /// /// LIFE terrain generator v0.6 rev 0.5
+/// {   
+///     Added new addons
+///     Added new TreeGenerator
+///     Opmized the orientation of objects programing
+///     flow logic optimized
+/// }
 /// </summary>
 
 public class TerrainGenerator : MonoBehaviour
@@ -209,6 +216,7 @@ public class TerrainGenerator : MonoBehaviour
                 if(y >= height - 1)
                 {
                     int t = Random.Range(0, treeChance);
+                    //int t2 = Random.Range(0, treeChance);
                     if (t == 1)
                     {
                         //Generate tree
@@ -221,14 +229,18 @@ public class TerrainGenerator : MonoBehaviour
                     {
                         int i = Random.Range(0, tallGrassChance);
 
-                        //Generate tree
-                        if (worldTiles.Contains(new Vector2(x, y)))
+                        if(i == 1)
                         {
-                            PlaceTile(tileAtlas.tallGrass.tileSprites, x, y + 1);
+                            //Generate grass
+                            if (worldTiles.Contains(new Vector2(x, y)))
+                            {
+                                PlaceTile(tileAtlas.tallGrass.tileSprites, x, y + 1);
+                            }
                         }
+                        
                     }
-
-                    if(t == 2)
+                    /*
+                    if(t2 == 2)
                     {
                         //Generate tree
                         if (worldTiles.Contains(new Vector2(x, y)))
@@ -236,6 +248,7 @@ public class TerrainGenerator : MonoBehaviour
                             GenerateTreeOrange(x, y + 1);
                         }
                     }
+                    */
                 }
             }
         }
