@@ -20,6 +20,7 @@ using UnityEngine;
 public class TileAtlas : ScriptableObject
 {
     //Basic
+    [Header("Environment")]
     public TileClass grass;
     public TileClass dirt;
     public TileClass stone;
@@ -27,8 +28,12 @@ public class TileAtlas : ScriptableObject
     public TileClass leaf;
     public TileClass leafOrange;
     public TileClass tallGrass;
+    public TileClass snow;
+    public TileClass sand;
+
 
     //Miners
+    [Header("Ores")]
     public TileClass coal;
     public TileClass iron;
     public TileClass gold;

@@ -19,6 +19,8 @@ MonoBehaviour:
   leaf: {fileID: 11400000, guid: 2f70f17716160184d96e21ad1d50cfea, type: 2}
   leafOrange: {fileID: 11400000, guid: 07a9eec64e178f542af28f9be07a38cf, type: 2}
   tallGrass: {fileID: 11400000, guid: a82060b1ab2a03d47b0d72b8a158a4bc, type: 2}
+  snow: {fileID: 11400000, guid: 7ee94de5e4b8b174ea73400593d72f50, type: 2}
+  sand: {fileID: 11400000, guid: be0bd02d3ea50314bb5fe5d61178136c, type: 2}
   coal: {fileID: 11400000, guid: 1ae5a0eb9d24a92448d925cf058b6052, type: 2}
   iron: {fileID: 11400000, guid: a4050ad9ee378304f82d568e59e2a703, type: 2}
   gold: {fileID: 11400000, guid: adbd8cd688b61dc499e20ea2d47f3c01, type: 2}
